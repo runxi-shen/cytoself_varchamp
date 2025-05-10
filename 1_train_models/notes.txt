@@ -14,13 +14,6 @@ Zarr supports compression. Does this help?
 If I convert, does it take way longer to access data from compressed files?
 
 
------- /dgxnas1 is almost full -------
-89% full - 2.4T of space remaining.
-The 'dgxnas1/cellpainting-datasets' dir has several very large datasets - seems like it's from Juan Caicedo. 
-Can we delete any of these? 
-
-
-
 ------ Things to try with Cytoself ------
 ________TO DO _________
 -Compare AUROC, cell count p-val, intensity p-val and see whether embeddings are really localization-specific
