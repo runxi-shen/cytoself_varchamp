@@ -17,7 +17,9 @@ from tqdm import tqdm
 
 VARCHAMP_CP_DIR = "../../0_data_prep/inputs/varchamp_cellpainting_gallery"
 ZARR_IMG_DIR = f"../../0_data_prep/outputs/zarr_images"
-VARCHAMP_PROF_DIR = "/home/shenrunx/igvf/varchamp/2021_09_01_VarChAMP/8.2_updated_snakemake_pipeline/outputs/batch_profiles"
+VARCHAMP_PROF_DIR = "../../0_data_prep/inputs/varchamp_snakemake_batch_profiles"
+VARCHAMP_IMG_WELL_QC_DIR = "../../0_data_prep/outputs/varchamp_img_qc_res"
+
 
 def crop_allele(allele: str, profile_df: pl.DataFrame, out_dir: str) -> None:
     """Crop images and save metadata as numpy arrays for one allele.
@@ -93,6 +95,24 @@ def main() -> None:
         imagecsv_dir = f"{VARCHAMP_CP_DIR}/{batch_id}"
         prof_path = f"{VARCHAMP_PROF_DIR}/{batch_id}/profiles.parquet"
 
+    """Filter cells and crop data.
+
+    Filter all cells according to many QA/QC criteria and then crop cells.
+
+    """
+    parser = argparse.ArgumentParser(description="Convert TIFF images to Zarr format.")
+    parser.add_argument("--batch_ids", required=True, help="Batch ID for processing images.")
+    parser.add_argument("--n_thread", type=int, default=128, help="Number of threads to use.")
+    args = parser.parse_args()
+    
+    batch_ids = args.batch_ids
+
+    for batch_id in batch_ids.split(","):
+        print("Processing batch ID: ", batch_id)
+        imagecsv_dir = f"{VARCHAMP_CP_DIR}/{batch_id}"
+        prof_path = f"{VARCHAMP_PROF_DIR}/{batch_id}/profiles.parquet"
+        img_well_qc = f"{VARCHAMP_IMG_WELL_QC_DIR}/{batch_id}/plate_well_sum_with_qc_metrics.parquet"
+
         # Filter thresholds
         min_area_ratio = 0.15
         max_area_ratio = 0.3
@@ -100,7 +120,7 @@ def main() -> None:
         max_center = 1030
         num_mad = 5
         min_cells = 250
-
+        
         # Get metadata
         profiles = pl.scan_parquet(prof_path).select(
             ["Metadata_well_position", "Metadata_plate_map_name", "Metadata_ImageNumber", "Metadata_ObjectNumber",
@@ -169,6 +189,17 @@ def main() -> None:
             (pl.col("Nuclei_AreaShape_Center_X") + 50).alias("x_high").round().cast(pl.Int16),
             (pl.col("Nuclei_AreaShape_Center_Y") - 50).alias("y_low").round().cast(pl.Int16),
             (pl.col("Nuclei_AreaShape_Center_Y") + 50).alias("y_high").round().cast(pl.Int16),
+        )
+
+        ## add img well QC results
+        img_qc_df = pl.read_parquet(img_well_qc)
+        profiles = profiles.join(
+            img_qc_df,
+            left_on=["Metadata_Plate", "Metadata_well_position"],
+            right_on=["plate", "well"],
+            how="left"
+        ).filter(
+            ~pl.col("is_bg")
         )
 
         # Read in all Image.csv to get ImageNumber:SiteNumber mapping and paths

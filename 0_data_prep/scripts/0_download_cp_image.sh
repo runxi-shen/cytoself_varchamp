@@ -17,7 +17,9 @@ HOMEPATH="../inputs/varchamp_cellpainting_gallery"
 
 for batch_id in $batches;
 do
+    ## download raw images from the s3 cell-painting gallery
     aws s3 sync --no-sign-request "$AWS_IMG_PATH/$batch_id/images" $HOMEPATH/$batch_id/images
+    ## download the image segmentation info from the cell-painting gallery
     aws s3 sync --no-sign-request \
         "$AWS_ANALYSIS_PATH/$batch_id" \
         "$HOMEPATH/$batch_id/analysis" \
