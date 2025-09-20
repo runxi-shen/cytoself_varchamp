@@ -1,4 +1,36 @@
-# cytoself
+# Re-train Cytoslef on VarChAMP data
+
+This is a repo for re-training the Cytoself model on the VarChAMP dataset, aiming to capture the changes in protein localization between coding variants and their reference genes.
+
+## How this project is organized
+
+We follow [Cookiecutter Data Science](https://cookiecutter-data-science.drivendata.org/) principles with specific adaptations for our lab's needs.
+
+### Core Principles
+
+1. **Data flows in one direction**: `raw/` + `external/` → `interim/` → `processed/`
+2. **Raw data is immutable**: Never edit raw data directly
+3. **Clear separation of concerns**: Pipeline-managed data vs. personal analysis
+4. **Everything is reproducible**: Code + raw data = any output
+
+### Directory Structure
+
+```text
+cytoself_varchamp/
+├── data/
+│   ├── raw/          # Original, immutable data: cell-painting gallery raw images and processed CellProfiler profiles
+│   ├── external/     # Third-party reference data: HPA/OpenCell Subcellular Localization Data
+│   ├── interim/      # Pipeline-generated intermediate data
+│   └── processed/    # Final analysis scripts
+├── models/   # Python package with processing code
+├── notebooks/        # Numbered analysis notebooks
+├── scripts/          # Shell scripts for data import
+└── docs/            # Documentation
+```
+
+## cytoself - original doc
+
+[Cytoself](https://github.com/royerlab/cytoself)
 
 [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-397/)
 [![DOI](https://img.shields.io/badge/DOI-10.1038%2Fs41592--022--01541--z-%23403075)](https://doi.org/10.1038/s41592-022-01541-z)

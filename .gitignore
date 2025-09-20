@@ -123,3 +123,12 @@ Thumbs.db
 tb_logs/
 demo_output/
 outputs/
+
+# Large files
+data/raw/varchamp_snakemake_batch_profiles
+data/raw/varchamp_cellpainting_gallery
+
+data/interim/1_zarr_images
+data/interim/3_model_input
+
+models/
